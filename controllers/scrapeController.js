@@ -1,17 +1,20 @@
 var jsdom = require('jsdom');
 const {JSDOM} = jsdom;
 
-exports.scrape = (req, res)=>{
+exports.scrape =async (req, res)=>{
 
   let toiUrl = 'https://timesofindia.indiatimes.com/coronavirus';
   let ndtvUrl = 'https://www.ndtv.com/coronavirus';
   let indiatodayUrl = 'https://www.indiatoday.in/coronavirus-covid-19-outbreak';
   
   let newsJson = {
-    toi: []
+    toi: [],
+    ndtv: [],
+    indiatoday: []
   }
 
-  JSDOM.fromURL(toiUrl).then(dom=>{
+  //toi scrape
+  await JSDOM.fromURL(toiUrl).then(dom=>{
 
     let titleArray = [];
     let urlArray = [];
@@ -77,7 +80,7 @@ exports.scrape = (req, res)=>{
       })
     }
 
-    console.log(newsJson)
+    //console.log(newsJson)
 
     //titleArray.map((title)=>{
       //newsJson.toi.push({
@@ -90,6 +93,50 @@ exports.scrape = (req, res)=>{
        //"url": url 
      //})
     //})
+
+  })
+
+  
+  //ndtv scrape
+  await JSDOM.fromURL(ndtvUrl).then(dom=>{
+
+    let titleArray = [];
+    let urlArray = [];
+
+    let parentDom =  dom.window.document.querySelector('.top-story').firstElementChild
+      .nextElementSibling;
+    let mainStoryText = parentDom.firstElementChild.firstElementChild.nextElementSibling.textContent.trim();
+    let mainStroryUrl = parentDom.firstElementChild.firstElementChild.nextElementSibling.firstElementChild.href;
+
+    titleArray.push(mainStoryText);
+    urlArray.push(mainStroryUrl);
+
+    //console.log(mainStoryText)
+    
+    let listDom = parentDom.firstElementChild.nextElementSibling.childNodes;
+    for(let i=0; i<6; i++){
+      let tempText = listDom[i].firstElementChild.nextElementSibling.textContent.trim();
+      let tempUrl = listDom[i].firstElementChild.href;
+      titleArray.push(tempText);
+      urlArray.push(tempUrl);
+    }
+
+    //listDom.forEach(node=>{
+      //console.log(node.firstElementChild.nextElementSibling.textContent.trim())
+      //let tempText = node.firstElementChild.nextElementSibling.textContent.trim();
+      //let tempUrl = node.firstElementChild.href;
+      //titleArray.push(tempText);
+      //urlArray.push(tempUrl);
+    //})
+
+    for (let i in titleArray){
+      newsJson.ndtv.push({
+        "title": titleArray[i],
+        "url": urlArray[i]
+      })
+    }
+
+    console.log(newsJson)
 
   })
 }
