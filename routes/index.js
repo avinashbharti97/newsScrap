@@ -1,6 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var scrape = require('../controllers/scrapeController.js')
+const newsPath = './news.json';
+const fs = require('fs')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -9,6 +11,16 @@ router.get('/', function(req, res, next) {
 
 
 router.get('/scrape', scrape.scrape)
+
+router.get('/news', (req, res)=>{
+  fs.readFile(newsPath, 'utf8', (err, data)=>{
+    if(err){
+      throw err;
+    }
+
+    res.send(JSON.parse(data));
+  })
+})
 
 
 module.exports = router;

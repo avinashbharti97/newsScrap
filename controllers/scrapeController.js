@@ -1,5 +1,6 @@
 var jsdom = require('jsdom');
 const {JSDOM} = jsdom;
+const fs = require('fs');
 
 exports.scrape =async (req, res)=>{
 
@@ -76,7 +77,8 @@ exports.scrape =async (req, res)=>{
     for (let i in titleArray){
       newsJson.toi.push({
         "title": titleArray[i],
-        "url": urlArray[i]
+        "url": urlArray[i],
+        "content": "NA"
       })
     }
 
@@ -132,11 +134,12 @@ exports.scrape =async (req, res)=>{
     for (let i in titleArray){
       newsJson.ndtv.push({
         "title": titleArray[i],
-        "url": urlArray[i]
+        "url": urlArray[i],
+        "content": "NA"
       })
     }
 
-    console.log(newsJson)
+    //console.log(newsJson)
 
   });
 
@@ -174,7 +177,22 @@ exports.scrape =async (req, res)=>{
       })
     }
 
-    console.log(newsJson)
+    //console.log(newsJson)
 
   })
+  const obj = JSON.stringify(newsJson, null, 4);
+  console.log(obj)
+  //exporting json file
+  fs.writeFile("news.json", obj, 'utf8', (err)=>{
+
+    if(err){
+      console.log("An error occured while saving the file");
+      return console.log(err);
+    }
+
+    console.log('Json file has been exported')
+  })
+  
+  //console.log(obj)
+  res.send('success');
 }
