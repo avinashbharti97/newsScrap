@@ -8,11 +8,13 @@ exports.scrape =async (req, res)=>{
   let ndtvUrl = 'https://www.ndtv.com/coronavirus';
   let indiatodayUrl = 'https://www.indiatoday.in/coronavirus-covid-19-outbreak';
   
-  let newsJson = {
-    toi: [],
-    ndtv: [],
-    indiatoday: []
-  }
+  //let newsJson = {
+    //toi: [],
+    //ndtv: [],
+    //indiatoday: []
+  //}
+  
+  let newsJson = [];
 
   //toi scrape
   await JSDOM.fromURL(toiUrl).then(dom=>{
@@ -75,10 +77,11 @@ exports.scrape =async (req, res)=>{
     //console.log(urlArray)
 
     for (let i in titleArray){
-      newsJson.toi.push({
+      newsJson.push({
         "title": titleArray[i],
         "url": urlArray[i],
-        "content": "NA"
+        "content": "NA",
+        "source": "Times of india"
       })
     }
 
@@ -132,10 +135,11 @@ exports.scrape =async (req, res)=>{
     //})
 
     for (let i in titleArray){
-      newsJson.ndtv.push({
+      newsJson.push({
         "title": titleArray[i],
         "url": urlArray[i],
-        "content": "NA"
+        "content": "NA",
+        "source": "NDTV"
       })
     }
 
@@ -170,10 +174,11 @@ exports.scrape =async (req, res)=>{
     })
 
     for (let i in titleArray){
-      newsJson.indiatoday.push({
+      newsJson.push({
         "title": titleArray[i],
         "url": urlArray[i],
-        "content": shortContentArray[i]
+        "content": shortContentArray[i],
+        "source": "India Times"
       })
     }
 
