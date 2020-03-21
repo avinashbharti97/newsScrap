@@ -199,5 +199,4 @@ exports.scrape =async (req, res)=>{
   })
   
   //console.log(obj)
-  res.send('success');
 }
