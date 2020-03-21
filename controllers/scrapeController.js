@@ -138,5 +138,43 @@ exports.scrape =async (req, res)=>{
 
     console.log(newsJson)
 
+  });
+
+
+  //indiatody scrape
+  await JSDOM.fromURL(indiatodayUrl).then(dom=>{
+
+    let titleArray = [];
+    let urlArray = [];
+    let shortContentArray = [];
+
+    let parentDom =  dom.window.document.querySelector('.view-content').childNodes;
+
+    //for(let i=0; i<6; i++){
+      //let tempText = listDom[i].firstElementChild.nextElementSibling.textContent.trim();
+      //let tempUrl = listDom[i].firstElementChild.href;
+      //titleArray.push(tempText);
+      //urlArray.push(tempUrl);
+    //}
+
+    parentDom.forEach(node=>{
+      let tempText = node.firstElementChild.nextElementSibling.firstElementChild.textContent.trim();
+      let tempUrl = node.firstElementChild.nextElementSibling.firstElementChild.firstElementChild.href;
+      let tempContent = node.firstElementChild.nextElementSibling.firstElementChild.nextElementSibling.textContent;
+      titleArray.push(tempText);
+      urlArray.push(tempUrl);
+      shortContentArray.push(tempContent);
+    })
+
+    for (let i in titleArray){
+      newsJson.indiatoday.push({
+        "title": titleArray[i],
+        "url": urlArray[i],
+        "content": shortContentArray[i]
+      })
+    }
+
+    console.log(newsJson)
+
   })
 }
