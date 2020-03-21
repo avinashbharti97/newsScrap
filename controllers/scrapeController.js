@@ -8,7 +8,7 @@ exports.scrape = (req, res)=>{
   let indiatodayUrl = 'https://www.indiatoday.in/coronavirus-covid-19-outbreak';
   
   let newsJson = {
-    latestNews: []
+    toi: []
   }
 
   JSDOM.fromURL(toiUrl).then(dom=>{
@@ -22,7 +22,6 @@ exports.scrape = (req, res)=>{
       .firstElementChild
       .nextElementSibling;
 
-    titleArray.push(parentDom.firstElementChild.firstElementChild.textContent);
 
     let tempDomLeftCol =parentDom 
       .firstElementChild
@@ -43,29 +42,53 @@ exports.scrape = (req, res)=>{
       .firstElementChild
       .childNodes;
 
+    titleArray.push(parentDom.firstElementChild.firstElementChild.textContent);
+    urlArray.push(parentDom.firstElementChild.firstElementChild.firstElementChild.href);
+
     tempDomLeftCol.forEach(node=>{
       let tempText = node.textContent;
+      let tempUrl  = node.firstElementChild.href;
       titleArray.push(tempText);
+      urlArray.push(tempUrl);
     });
 
     tempDomRightCol.forEach(node=>{
       let tempText = node.textContent;
+      let tempUrl = node.href;
       titleArray.push(tempText);
+      urlArray.push(tempUrl);
     });
 
     tempDomRightBottomCol.forEach(node=>{
       let tempText = node.textContent;
+      let tempUrl = node.firstElementChild.href;
       titleArray.push(tempText);
+      urlArray.push(tempUrl);
     })
 
 
-    console.log(titleArray);
+    //console.log(titleArray);
+    //console.log(urlArray)
 
+    for (let i in titleArray){
+      newsJson.toi.push({
+        "title": titleArray[i],
+        "url": urlArray[i]
+      })
+    }
 
-    //newsJson.latestNews.push({
-      //"title": tempTitle,
-      //"url": tempUrl,
-      //"source": tempSource
+    console.log(newsJson)
+
+    //titleArray.map((title)=>{
+      //newsJson.toi.push({
+       //"title": title
+     //})
+    //})
+
+    //urlArray.map((url)=>{
+      //newsJson.toi.push({
+       //"url": url 
+     //})
     //})
 
   })
