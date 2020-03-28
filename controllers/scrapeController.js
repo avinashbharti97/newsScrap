@@ -19,13 +19,26 @@ exports.scrape =async (req, res)=>{
   
   let newsJson = [];
 
+  let titleArrayToi = [];
+  let urlArrayToi = [];
+  let sourceArrayToi = [];
+  let contentArrayToi = [];
+
+
+  let titleArrayNdtv = [];
+  let urlArrayNdtv = [];
+  let sourceArrayNdtv = [];
+  let contentArrayNdtv = [];
+
+
+  let titleArrayIndiatimes = [];
+  let urlArrayIndiatimes = [];
+  let sourceArrayIndiatimes = [];
+  let contentArrayIndiatimes  = [];
+
   //toi scrape
   await JSDOM.fromURL(toiUrl).then(dom=>{
 
-    let titleArray = [];
-    let urlArray = [];
-    let sourceArray = [];
-    let contentArray = [];
     
     let parentDom =  dom.window.document.querySelector('.news-list').firstElementChild
       .nextElementSibling
@@ -52,49 +65,44 @@ exports.scrape =async (req, res)=>{
       .firstElementChild
       .childNodes;
 
-    titleArray.push(parentDom.firstElementChild.firstElementChild.textContent);
+    titleArrayToi.push(parentDom.firstElementChild.firstElementChild.textContent);
     let url1 =parentDom.firstElementChild.firstElementChild.firstElementChild.href;
-    urlArray.push(url1);
+    urlArrayToi.push(url1);
 
     tempDomLeftCol.forEach(node=>{
       let tempText = node.textContent;
       let tempUrl  = node.firstElementChild.href;
-      titleArray.push(tempText);
-      urlArray.push(tempUrl);
+      titleArrayToi.push(tempText);
+      urlArrayToi.push(tempUrl);
     });
 
     tempDomRightCol.forEach(node=>{
       let tempText = node.textContent;
       let tempUrl = node.href;
-      titleArray.push(tempText);
-      urlArray.push(tempUrl);
+      titleArrayToi.push(tempText);
+      urlArrayToi.push(tempUrl);
     });
 
     tempDomRightBottomCol.forEach(node=>{
       let tempText = node.textContent;
       let tempUrl = node.firstElementChild.href;
-      titleArray.push(tempText);
-      urlArray.push(tempUrl);
-    })
+      titleArrayToi.push(tempText);
+      urlArrayToi.push(tempUrl);
+    });
 
 
     //console.log(titleArray);
     //console.log(urlArray)
 
-    for (let i in titleArray){
-      newsJson.push({
-        "title": titleArray[i],
-        "url": urlArray[i],
-        "content": "NA",
-        "source": "Times of india"
-      })
-    }
 
-    (async ()=>{
-      console.log('worked')
-      for(let i in urlArray){
+
+  })
+
+    await (async ()=>{
+      //console.log('worked')
+      for(let i in urlArrayToi){
         var originalNewsContent = '';
-        await JSDOM.fromURL(urlArray[i]).then(dom=>{
+        await JSDOM.fromURL(urlArrayToi[i]).then(dom=>{
           originalNewsContent =dom.window.document.querySelector('._3WlLe').
           innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
           replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
@@ -110,24 +118,27 @@ exports.scrape =async (req, res)=>{
           text: originalNewsContent,
         });
         console.log('summerized content: ', resp)
+
+        await newsJson.push({
+          "title": titleArrayToi[i],
+          "url": urlArrayToi[i],
+          "content":resp,
+          "source": "Times of india"
+        })
       }
     })();
-  })
 
   
   //ndtv scrape
   await JSDOM.fromURL(ndtvUrl).then(dom=>{
-
-    let titleArray = [];
-    let urlArray = [];
 
     let parentDom =  dom.window.document.querySelector('.top-story').firstElementChild
       .nextElementSibling;
     let mainStoryText = parentDom.firstElementChild.firstElementChild.nextElementSibling.textContent.trim();
     let mainStroryUrl = parentDom.firstElementChild.firstElementChild.nextElementSibling.firstElementChild.href;
 
-    titleArray.push(mainStoryText);
-    urlArray.push(mainStroryUrl);
+    titleArrayNdtv.push(mainStoryText);
+    urlArrayNdtv.push(mainStroryUrl);
 
     //console.log(mainStoryText)
     
@@ -135,22 +146,15 @@ exports.scrape =async (req, res)=>{
     for(let i=0; i<6; i++){
       let tempText = listDom[i].firstElementChild.nextElementSibling.textContent.trim();
       let tempUrl = listDom[i].firstElementChild.href;
-      titleArray.push(tempText);
-      urlArray.push(tempUrl);
+      titleArrayNdtv.push(tempText);
+      urlArrayNdtv.push(tempUrl);
     }
 
-    //listDom.forEach(node=>{
-      //console.log(node.firstElementChild.nextElementSibling.textContent.trim())
-      //let tempText = node.firstElementChild.nextElementSibling.textContent.trim();
-      //let tempUrl = node.firstElementChild.href;
-      //titleArray.push(tempText);
-      //urlArray.push(tempUrl);
-    //})
 
-    for (let i in titleArray){
+    for (let i in titleArrayNdtv){
       newsJson.push({
-        "title": titleArray[i],
-        "url": urlArray[i],
+        "title": titleArrayNdtv[i],
+        "url": urlArrayNdtv[i],
         "content": "NA",
         "source": "NDTV"
       })
@@ -164,33 +168,21 @@ exports.scrape =async (req, res)=>{
   //indiatody scrape
   await JSDOM.fromURL(indiatodayUrl).then(dom=>{
 
-    let titleArray = [];
-    let urlArray = [];
-    let shortContentArray = [];
-
     let parentDom =  dom.window.document.querySelector('.view-content').childNodes;
-
-    //for(let i=0; i<6; i++){
-      //let tempText = listDom[i].firstElementChild.nextElementSibling.textContent.trim();
-      //let tempUrl = listDom[i].firstElementChild.href;
-      //titleArray.push(tempText);
-      //urlArray.push(tempUrl);
-    //}
 
     parentDom.forEach(node=>{
       let tempText = node.firstElementChild.nextElementSibling.firstElementChild.textContent.trim();
       let tempUrl = node.firstElementChild.nextElementSibling.firstElementChild.firstElementChild.href;
       let tempContent = node.firstElementChild.nextElementSibling.firstElementChild.nextElementSibling.textContent;
-      titleArray.push(tempText);
-      urlArray.push(tempUrl);
-      shortContentArray.push(tempContent);
+      titleArrayIndiatimes.push(tempText);
+      urlArrayIndiatimes.push(tempUrl);
     })
 
-    for (let i in titleArray){
+    for (let i in titleArrayIndiatimes){
       newsJson.push({
-        "title": titleArray[i],
-        "url": urlArray[i],
-        "content": shortContentArray[i],
+        "title": titleArrayIndiatimes[i],
+        "url": urlArrayIndiatimes[i],
+        "content": "NA",
         "source": "India Times"
       })
     }
@@ -211,5 +203,5 @@ exports.scrape =async (req, res)=>{
     console.log('Json file has been exported')
   })
   
-  //console.log(obj)
+  console.log(obj)
 }
