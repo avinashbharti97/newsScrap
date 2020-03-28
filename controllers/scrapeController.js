@@ -1,6 +1,9 @@
 var jsdom = require('jsdom');
 const {JSDOM} = jsdom;
 const fs = require('fs');
+const deepai = require('deepai'); // OR include deepai.min.js as a script tag in your HTML
+
+deepai.setApiKey('160dbac5-bdd6-40b8-8f50-0a63c580ea71');
 
 exports.scrape =async (req, res)=>{
 
@@ -90,15 +93,23 @@ exports.scrape =async (req, res)=>{
     (async ()=>{
       console.log('worked')
       for(let i in urlArray){
+        var originalNewsContent = '';
         await JSDOM.fromURL(urlArray[i]).then(dom=>{
-          let originalNewsContent =dom.window.document.querySelector('._3WlLe').
+          originalNewsContent =dom.window.document.querySelector('._3WlLe').
           innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
           replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
           replace(/<br>/ig,"\n").
           replace(/<\/div>/ig, "").
-            replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "");
-         console.log('news content', originalNewsContent); 
-        })
+            replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
+          .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
+          //console.log('news content: ', originalNewsContent); 
+         //contentArray.push(originalNewsContent);
+
+        }); 
+        var resp = await deepai.callStandardApi("summarization",{
+          text: originalNewsContent,
+        });
+        console.log('summerized content: ', resp)
       }
     })();
   })
