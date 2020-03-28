@@ -22,6 +22,7 @@ exports.scrape =async (req, res)=>{
     let titleArray = [];
     let urlArray = [];
     let sourceArray = [];
+    let contentArray = [];
     
     let parentDom =  dom.window.document.querySelector('.news-list').firstElementChild
       .nextElementSibling
@@ -49,7 +50,8 @@ exports.scrape =async (req, res)=>{
       .childNodes;
 
     titleArray.push(parentDom.firstElementChild.firstElementChild.textContent);
-    urlArray.push(parentDom.firstElementChild.firstElementChild.firstElementChild.href);
+    let url1 =parentDom.firstElementChild.firstElementChild.firstElementChild.href;
+    urlArray.push(url1);
 
     tempDomLeftCol.forEach(node=>{
       let tempText = node.textContent;
@@ -85,20 +87,20 @@ exports.scrape =async (req, res)=>{
       })
     }
 
-    //console.log(newsJson)
-
-    //titleArray.map((title)=>{
-      //newsJson.toi.push({
-       //"title": title
-     //})
-    //})
-
-    //urlArray.map((url)=>{
-      //newsJson.toi.push({
-       //"url": url 
-     //})
-    //})
-
+    (async ()=>{
+      console.log('worked')
+      for(let i in urlArray){
+        await JSDOM.fromURL(urlArray[i]).then(dom=>{
+          let originalNewsContent =dom.window.document.querySelector('._3WlLe').
+          innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
+          replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
+          replace(/<br>/ig,"\n").
+          replace(/<\/div>/ig, "").
+            replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "");
+         console.log('news content', originalNewsContent); 
+        })
+      }
+    })();
   })
 
   
@@ -185,10 +187,10 @@ exports.scrape =async (req, res)=>{
     //console.log(newsJson)
 
   })
-  const obj = JSON.stringify(newsJson, null, 4);
-  console.log(obj)
+  const obj = await JSON.stringify(newsJson, null, 4);
+  //console.log(obj)
   //exporting json file
-  fs.writeFile("news.json", obj, 'utf8', (err)=>{
+  await fs.writeFile("news.json", obj, 'utf8', (err)=>{
 
     if(err){
       console.log("An error occured while saving the file");
