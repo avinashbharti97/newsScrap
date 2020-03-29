@@ -117,7 +117,7 @@ exports.scrape =async (req, res)=>{
         var resp = await deepai.callStandardApi("summarization",{
           text: originalNewsContent,
         });
-        console.log('summerized content: ', resp)
+        //console.log('summerized content: ', resp)
 
         await newsJson.push({
           "title": titleArrayToi[i],
@@ -151,19 +151,46 @@ exports.scrape =async (req, res)=>{
     }
 
 
-    for (let i in titleArrayNdtv){
-      newsJson.push({
-        "title": titleArrayNdtv[i],
-        "url": urlArrayNdtv[i],
-        "content": "NA",
-        "source": "NDTV"
-      })
-    }
+    //for (let i in titleArrayNdtv){
+      //newsJson.push({
+        //"title": titleArrayNdtv[i],
+        //"url": urlArrayNdtv[i],
+        //"content": "NA",
+        //"source": "NDTV"
+      //})
+    //}
 
     //console.log(newsJson)
 
   });
 
+    await (async ()=>{
+      //console.log('worked')
+      for(let i in urlArrayNdtv){
+        var originalContent = '';
+        await JSDOM.fromURL(urlArrayNdtv[i]).then(dom=>{
+          var originalNewsContentDom =dom.window.document.querySelector('.sp-cn').querySelectorAll('p');
+          originalNewsContentDom[0].remove();
+          originalNewsContentDom.forEach(dom=>{
+            originalContent+=dom.textContent;
+            originalContent+=" ";
+          })
+          //console.log('original: '+originalContent)
+
+        }); 
+        var resp = await deepai.callStandardApi("summarization",{
+          text: originalContent,
+        });
+        //console.log('summerized content: ', resp)
+
+        await newsJson.push({
+          "title": titleArrayNdtv[i],
+          "url": urlArrayNdtv[i],
+          "content":resp,
+          "source": "NDTV"
+        })
+      }
+    })();
 
   //indiatody scrape
   await JSDOM.fromURL(indiatodayUrl).then(dom=>{
