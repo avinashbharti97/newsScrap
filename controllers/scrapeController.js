@@ -205,18 +205,51 @@ exports.scrape =async (req, res)=>{
       urlArrayIndiatimes.push(tempUrl);
     })
 
-    for (let i in titleArrayIndiatimes){
-      newsJson.push({
-        "title": titleArrayIndiatimes[i],
-        "url": urlArrayIndiatimes[i],
-        "content": "NA",
-        "source": "India Times"
-      })
-    }
+    //for (let i in titleArrayIndiatimes){
+      //newsJson.push({
+        //"title": titleArrayIndiatimes[i],
+        //"url": urlArrayIndiatimes[i],
+        //"content": "NA",
+        //"source": "India Times"
+      //})
+    //}
 
     //console.log(newsJson)
 
-  })
+  });
+
+    await (async ()=>{
+      //console.log('worked')
+      for(let i in urlArrayIndiatimes){
+        var originalContent = '';
+        await JSDOM.fromURL(urlArrayIndiatimes[i]).then(dom=>{
+          var temp =dom.window.document.querySelector('.description')
+          if(temp === null){
+            originalContent = "NA";
+          }
+          else{
+            var temp2 =temp.querySelectorAll('div');
+            temp2.forEach(d=>{
+              d.remove();
+            })
+            originalContent = temp.textContent.split("ALSO READ")[0];
+          }
+          //console.log(urlArrayIndiatimes[i], originalContent);
+        }); 
+        var resp = await deepai.callStandardApi("summarization",{
+          text: originalContent,
+        });
+        //console.log('summerized content: ', resp)
+
+        await newsJson.push({
+          "title": titleArrayIndiatimes[i],
+          "url": urlArrayIndiatimes[i],
+          "content":resp,
+          "source": "India Times"
+        })
+      }
+    })();
+
   const obj = await JSON.stringify(newsJson, null, 4);
   //console.log(obj)
   //exporting json file
