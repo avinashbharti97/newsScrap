@@ -11,8 +11,8 @@ router.get('/', function(req, res, next) {
 });
 
 
-router.get('/scrape', scrape.scrape)
-//cron.schedule("* * * * *", scrape.scrape);
+//router.get('/scrape', scrape.scrape)
+cron.schedule("*/30 * * * *", scrape.scrape);
 
 router.get('/news', (req, res)=>{
   fs.readFile(newsPath, 'utf8', (err, data)=>{
