@@ -122,7 +122,7 @@ exports.scrape =async (req, res)=>{
         await newsJson.push({
           "title": titleArrayToi[i],
           "url": urlArrayToi[i],
-          "content":resp,
+          "content":resp.output,
           "source": "Times of india"
         })
       }
@@ -186,7 +186,7 @@ exports.scrape =async (req, res)=>{
         await newsJson.push({
           "title": titleArrayNdtv[i],
           "url": urlArrayNdtv[i],
-          "content":resp,
+          "content":resp.output,
           "source": "NDTV"
         })
       }
@@ -244,7 +244,7 @@ exports.scrape =async (req, res)=>{
         await newsJson.push({
           "title": titleArrayIndiatimes[i],
           "url": urlArrayIndiatimes[i],
-          "content":resp,
+          "content":resp.output,
           "source": "India Times"
         })
       }
