@@ -3,6 +3,8 @@ const {JSDOM} = jsdom;
 const fs = require('fs');
 const deepai = require('deepai'); // OR include deepai.min.js as a script tag in your HTML
 
+var resultObj;
+
 deepai.setApiKey('160dbac5-bdd6-40b8-8f50-0a63c580ea71');
 
 exports.scrape =async (req, res)=>{
@@ -65,9 +67,9 @@ exports.scrape =async (req, res)=>{
       .firstElementChild
       .childNodes;
 
-    titleArrayToi.push(parentDom.firstElementChild.firstElementChild.textContent);
-    let url1 =parentDom.firstElementChild.firstElementChild.firstElementChild.href;
-    urlArrayToi.push(url1);
+    //titleArrayToi.push(parentDom.firstElementChild.firstElementChild.textContent);
+    //let url1 =parentDom.firstElementChild.firstElementChild.firstElementChild.href;
+    //urlArrayToi.push(url1);
 
     tempDomLeftCol.forEach(node=>{
       let tempText = node.textContent;
@@ -249,7 +251,7 @@ exports.scrape =async (req, res)=>{
         })
       }
     })();
-
+  resultObj = newsJson;
   const obj = await JSON.stringify(newsJson, null, 4);
   //console.log(obj)
   //exporting json file
@@ -264,4 +266,9 @@ exports.scrape =async (req, res)=>{
   })
   
   console.log(obj)
+}
+
+
+exports.getNews =async (req, res)=>{
+  res.send(resultObj)
 }

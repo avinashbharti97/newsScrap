@@ -11,8 +11,8 @@ router.get('/', function(req, res, next) {
 });
 
 
-//router.get('/scrape', scrape.scrape)
-cron.schedule("*/30 * * * *", scrape.scrape);
+router.get('/scrape', scrape.scrape)
+//cron.schedule("*/30 * * * *", scrape.scrape);
 
 router.get('/news', (req, res)=>{
   fs.readFile(newsPath, 'utf8', (err, data)=>{
@@ -23,6 +23,8 @@ router.get('/news', (req, res)=>{
     res.send(JSON.parse(data));
   })
 })
+
+router.get('/getNews', scrape.getNews);
 
 
 module.exports = router;
