@@ -5,7 +5,7 @@ Get latest covid-19 summerized news from different India's news leading platform
 ![](covidNewsDesktop.gif)
 
 ## Mobile view
-![]()
+![](mobile.gif)
 ---
 # Technology used
 
