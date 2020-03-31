@@ -105,13 +105,15 @@ exports.scrape =async (req, res)=>{
       for(let i in urlArrayToi){
         var originalNewsContent = '';
         await JSDOM.fromURL(urlArrayToi[i]).then(dom=>{
-          originalNewsContent =dom.window.document.querySelector('._3WlLe').
-          innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
-          replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
-          replace(/<br>/ig,"\n").
-          replace(/<\/div>/ig, "").
-            replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
-          .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
+          if(dom.window.document.querySelector('._3WlLe'!= null)){
+              originalNewsContent =dom.window.document.querySelector('._3WlLe').
+              innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
+              replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
+              replace(/<br>/ig,"\n").
+              replace(/<\/div>/ig, "").
+                replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
+                  .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
+          }
           //console.log('news content: ', originalNewsContent); 
          //contentArray.push(originalNewsContent);
 
@@ -266,6 +268,7 @@ exports.scrape =async (req, res)=>{
   })
   
   console.log(obj)
+  res.send(obj)
 }
 
 
