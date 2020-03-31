@@ -1,7 +1,11 @@
 # covid-19 news 
 
 Get latest covid-19 summerized news from different India's news leading platform at same place
+## Desktop view
+![](covidNewsDesktop.gif)
 
+## Mobile view
+![]()
 ---
 # Technology used
 
