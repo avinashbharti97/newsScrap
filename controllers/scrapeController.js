@@ -5,7 +5,7 @@ const deepai = require('deepai'); // OR include deepai.min.js as a script tag in
 
 var resultObj;
 
-deepai.setApiKey('160dbac5-bdd6-40b8-8f50-0a63c580ea71');
+deepai.setApiKey('658a2607-dbad-408d-a7a4-6e3bb75c2daa');
 
 exports.scrape =async (req, res)=>{
 
@@ -104,23 +104,29 @@ exports.scrape =async (req, res)=>{
       //console.log('worked')
       for(let i in urlArrayToi){
         var originalNewsContent = '';
-        await JSDOM.fromURL(urlArrayToi[i]).then(dom=>{
-          if(dom.window.document.querySelector('._3WlLe'!= null)){
-              originalNewsContent =dom.window.document.querySelector('._3WlLe').
-              innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
-              replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
-              replace(/<br>/ig,"\n").
-              replace(/<\/div>/ig, "").
-                replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
-                  .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
-          }
-          //console.log('news content: ', originalNewsContent); 
-         //contentArray.push(originalNewsContent);
+        try{
+          await JSDOM.fromURL(urlArrayToi[i]).then(dom=>{
+                originalNewsContent =dom.window.document.querySelector('._3WlLe').
+                innerHTML.replace( /<a(\s[^>]*)?>.*?<\/a>/ig, "").
+                replace(/<div(\s[^>]*)?>.*?<\/div>/ig,"").
+                replace(/<br>/ig,"\n").
+                replace(/<\/div>/ig, "").
+                  replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
+                    .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
+            //console.log('news content: ', originalNewsContent); 
+           //contentArray.push(originalNewsContent);
 
-        }); 
-        var resp = await deepai.callStandardApi("summarization",{
-          text: originalNewsContent,
-        });
+          }); 
+        }catch(e){
+          console.log(e)
+        }
+        try{
+          var resp = await deepai.callStandardApi("summarization",{
+            text: originalNewsContent,
+          });
+        }catch(e){
+          console.log(e)
+        }
         //console.log('summerized content: ', resp)
 
         await newsJson.push({
@@ -171,28 +177,41 @@ exports.scrape =async (req, res)=>{
     await (async ()=>{
       //console.log('worked')
       for(let i in urlArrayNdtv){
-        var originalContent = '';
-        await JSDOM.fromURL(urlArrayNdtv[i]).then(dom=>{
-          var originalNewsContentDom =dom.window.document.querySelector('.sp-cn').querySelectorAll('p');
-          originalNewsContentDom[0].remove();
-          originalNewsContentDom.forEach(dom=>{
-            originalContent+=dom.textContent;
-            originalContent+=" ";
+        console.log('ndtv '+ i+ " in " + urlArrayNdtv[i]);
+        var flag = urlArrayNdtv[i].search('www.ndtv.com');
+        if(flag!=-1){
+          var originalContent = '';
+          try{
+            await JSDOM.fromURL(urlArrayNdtv[i]).then(dom=>{
+              var originalNewsContentDom =dom.window.document.querySelector('.sp-cn').querySelectorAll('p');
+              originalNewsContentDom[0].remove();
+              originalNewsContentDom.forEach(dom=>{
+                originalContent+=dom.textContent;
+                originalContent+=" ";
+              })
+              //console.log('original: '+originalContent)
+
+            }); 
+          }catch(e){
+            console.error(e);
+          }
+
+          try{
+            var resp = await deepai.callStandardApi("summarization",{
+              text: originalContent,
+            });
+          }catch(e){
+            console.error(e);
+          }
+          //console.log('summerized content: ', resp)
+
+          await newsJson.push({
+            "title": titleArrayNdtv[i],
+            "url": urlArrayNdtv[i],
+            "content":resp.output,
+            "source": "NDTV"
           })
-          //console.log('original: '+originalContent)
-
-        }); 
-        var resp = await deepai.callStandardApi("summarization",{
-          text: originalContent,
-        });
-        //console.log('summerized content: ', resp)
-
-        await newsJson.push({
-          "title": titleArrayNdtv[i],
-          "url": urlArrayNdtv[i],
-          "content":resp.output,
-          "source": "NDTV"
-        })
+        }
       }
     })();
 
@@ -226,6 +245,8 @@ exports.scrape =async (req, res)=>{
       //console.log('worked')
       for(let i in urlArrayIndiatimes){
         var originalContent = '';
+
+        try{
         await JSDOM.fromURL(urlArrayIndiatimes[i]).then(dom=>{
           var temp =dom.window.document.querySelector('.description')
           if(temp === null){
@@ -243,6 +264,9 @@ exports.scrape =async (req, res)=>{
         var resp = await deepai.callStandardApi("summarization",{
           text: originalContent,
         });
+        }catch(e){
+          console.log(error)
+        }
         //console.log('summerized content: ', resp)
 
         await newsJson.push({
