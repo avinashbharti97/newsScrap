@@ -1,5 +1,6 @@
 var jsdom = require('jsdom');
 var moment = require('moment');
+var mtz = require('moment-timezone')
 const {JSDOM} = jsdom;
 const fs = require('fs');
 const deepai = require('deepai'); // OR include deepai.min.js as a script tag in your HTML
@@ -315,7 +316,7 @@ console.log('initial done')
     
     
   //})();
-  newsJson.time = moment().calendar();
+  newsJson.time = moment().utcOffset("+05:30").calendar();
   const obj = await JSON.stringify(newsJson, null, 4);
   resultObj = newsJson;
   //console.log(obj)
