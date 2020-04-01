@@ -1,4 +1,5 @@
 var jsdom = require('jsdom');
+var moment = require('moment');
 const {JSDOM} = jsdom;
 const fs = require('fs');
 const deepai = require('deepai'); // OR include deepai.min.js as a script tag in your HTML
@@ -118,7 +119,11 @@ console.log('initial done')
                     .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
             //console.log('news content: ', originalNewsContent); 
             //contentArray.push(originalNewsContent);
-            updateTime = dom.window.document.querySelector('._3Mkg-').textContent;
+            try{
+              updateTime = dom.window.document.querySelector('._3Mkg-').textContent;
+            }catch(e){
+              console.log(e);
+            }
 
           }); 
           console.log("toi 1 done")
@@ -199,7 +204,11 @@ console.log('initial done')
                 originalContent+=" ";
               })
               //console.log('original: '+originalContent)
-              updateTime = dom.window.document.querySelector('[itemprop="dateModified"]').textContent;
+              try{
+                updateTime = dom.window.document.querySelector('[itemprop="dateModified"]').textContent;
+              }catch(e){
+                console.log(e);
+              }
 
             }); 
           }catch(e){
@@ -272,7 +281,11 @@ console.log('initial done')
             originalContent = temp.textContent.split("ALSO READ")[0];
           }
           //console.log(urlArrayIndiatimes[i], originalContent);
-          updateTime = dom.window.document.querySelectorAll('.update-data')[0].textContent;
+          try{
+            updateTime = dom.window.document.querySelectorAll('.update-data')[0].textContent;
+          }catch(e){
+            console.log(e);
+          }
         }); 
         var resp = await deepai.callStandardApi("summarization",{
           text: originalContent,
@@ -293,15 +306,16 @@ console.log('initial done')
     })();
 
 
-  await(()=>{
-    var today = new Date();
-    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    var dateTime = date+' '+time;
-    newsJson.time = dateTime;
+  //await(()=>{
+    //var today = new Date();
+    //var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    //var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    //var dateTime = date+' '+time;
+    //newsJson.time = dateTime.toLocaleString();
     
     
-  })();
+  //})();
+  newsJson.time = moment().calendar();
   const obj = await JSON.stringify(newsJson, null, 4);
   resultObj = newsJson;
   //console.log(obj)
