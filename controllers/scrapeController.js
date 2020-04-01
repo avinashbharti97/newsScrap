@@ -19,7 +19,9 @@ exports.scrape =async (req, res)=>{
     //indiatoday: []
   //}
   
-  let newsJson = [];
+  let newsJson ={
+    news: [],
+  }
 
   let titleArrayToi = [];
   let urlArrayToi = [];
@@ -96,7 +98,7 @@ exports.scrape =async (req, res)=>{
     //console.log(titleArray);
     //console.log(urlArray)
 
-
+console.log('initial done')
 
   })
 
@@ -104,6 +106,7 @@ exports.scrape =async (req, res)=>{
       //console.log('worked')
       for(let i in urlArrayToi){
         var originalNewsContent = '';
+        var updateTime = ''; 
         try{
           await JSDOM.fromURL(urlArrayToi[i]).then(dom=>{
                 originalNewsContent =dom.window.document.querySelector('._3WlLe').
@@ -114,9 +117,11 @@ exports.scrape =async (req, res)=>{
                   replace(/<ul(\s[^>]*)?>.*?<\/ul>/ig, "")
                     .replace(/<span(\s[^>]*)?>.*?<\/span>/ig, "");
             //console.log('news content: ', originalNewsContent); 
-           //contentArray.push(originalNewsContent);
+            //contentArray.push(originalNewsContent);
+            updateTime = dom.window.document.querySelector('._3Mkg-').textContent;
 
           }); 
+          console.log("toi 1 done")
         }catch(e){
           console.log(e)
         }
@@ -128,13 +133,16 @@ exports.scrape =async (req, res)=>{
           console.log(e)
         }
         //console.log('summerized content: ', resp)
+        //
 
-        await newsJson.push({
+        await newsJson.news.push({
           "title": titleArrayToi[i],
           "url": urlArrayToi[i],
           "content":resp.output,
-          "source": "Times of india"
+          "source": "Times of india",
+          "time":updateTime 
         })
+        console.log("toi final")
       }
     })();
 
@@ -181,6 +189,7 @@ exports.scrape =async (req, res)=>{
         var flag = urlArrayNdtv[i].search('www.ndtv.com');
         if(flag!=-1){
           var originalContent = '';
+          var updateTime='';
           try{
             await JSDOM.fromURL(urlArrayNdtv[i]).then(dom=>{
               var originalNewsContentDom =dom.window.document.querySelector('.sp-cn').querySelectorAll('p');
@@ -190,6 +199,7 @@ exports.scrape =async (req, res)=>{
                 originalContent+=" ";
               })
               //console.log('original: '+originalContent)
+              updateTime = dom.window.document.querySelector('[itemprop="dateModified"]').textContent;
 
             }); 
           }catch(e){
@@ -205,12 +215,14 @@ exports.scrape =async (req, res)=>{
           }
           //console.log('summerized content: ', resp)
 
-          await newsJson.push({
+          await newsJson.news.push({
             "title": titleArrayNdtv[i],
             "url": urlArrayNdtv[i],
             "content":resp.output,
-            "source": "NDTV"
+            "source": "NDTV",
+            "time": updateTime
           })
+          console.log("ndtv final")
         }
       }
     })();
@@ -223,7 +235,6 @@ exports.scrape =async (req, res)=>{
     parentDom.forEach(node=>{
       let tempText = node.firstElementChild.nextElementSibling.firstElementChild.textContent.trim();
       let tempUrl = node.firstElementChild.nextElementSibling.firstElementChild.firstElementChild.href;
-      let tempContent = node.firstElementChild.nextElementSibling.firstElementChild.nextElementSibling.textContent;
       titleArrayIndiatimes.push(tempText);
       urlArrayIndiatimes.push(tempUrl);
     })
@@ -245,6 +256,7 @@ exports.scrape =async (req, res)=>{
       //console.log('worked')
       for(let i in urlArrayIndiatimes){
         var originalContent = '';
+        var updateTime = '';
 
         try{
         await JSDOM.fromURL(urlArrayIndiatimes[i]).then(dom=>{
@@ -260,25 +272,38 @@ exports.scrape =async (req, res)=>{
             originalContent = temp.textContent.split("ALSO READ")[0];
           }
           //console.log(urlArrayIndiatimes[i], originalContent);
+          updateTime = dom.window.document.querySelectorAll('.update-data')[0].textContent;
         }); 
         var resp = await deepai.callStandardApi("summarization",{
           text: originalContent,
         });
         }catch(e){
-          console.log(error)
+          console.log(e)
         }
         //console.log('summerized content: ', resp)
 
-        await newsJson.push({
+        await newsJson.news.push({
           "title": titleArrayIndiatimes[i],
           "url": urlArrayIndiatimes[i],
           "content":resp.output,
-          "source": "India Times"
+          "source": "India Today",
+          "time": updateTime
         })
       }
     })();
-  resultObj = newsJson;
+
+
+  await(()=>{
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    newsJson.time = dateTime;
+    
+    
+  })();
   const obj = await JSON.stringify(newsJson, null, 4);
+  resultObj = newsJson;
   //console.log(obj)
   //exporting json file
   await fs.writeFile("news.json", obj, 'utf8', (err)=>{
@@ -291,11 +316,11 @@ exports.scrape =async (req, res)=>{
     console.log('Json file has been exported')
   })
   
-  console.log(obj)
-  res.send(obj)
+  console.log(resultObj)
+  res.json(resultObj)
 }
 
 
 exports.getNews =async (req, res)=>{
-  res.send(resultObj)
+  res.json(resultObj)
 }
