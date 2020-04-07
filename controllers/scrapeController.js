@@ -1,4 +1,5 @@
 var jsdom = require('jsdom');
+var axios =  require('axios')
 var moment = require('moment');
 var mtz = require('moment-timezone')
 const {JSDOM} = jsdom;
@@ -321,7 +322,25 @@ console.log('initial done')
   resultObj = newsJson;
   //console.log(obj)
   //exporting json file
-  await fs.writeFile("news.json", obj, 'utf8', (err)=>{
+  //making a post request to restdb.io
+  const options = {
+    headers:{
+      'x-apikey': '58e92897164a893a31a9c6ea6a817a1cfe973',
+      'Content-type': 'application/json'
+    }
+  } 
+
+  axios.put('https://covidnews-45ef.restdb.io/rest/news/5e8be8c75053da750001d448', obj, options)
+    .then((res)=>{
+      console.log('put successful: '+res);
+    },
+      (error)=>{
+        console.log(error);
+      } 
+    )
+
+
+  await fs.writeFile('news.json', obj, 'utf8', (err)=>{
 
     if(err){
       console.log("An error occured while saving the file");
