@@ -8,7 +8,7 @@ const deepai = require('deepai'); // OR include deepai.min.js as a script tag in
 
 var resultObj;
 
-deepai.setApiKey('658a2607-dbad-408d-a7a4-6e3bb75c2daa');
+deepai.setApiKey('5e3edbec-e9c1-4bd0-9304-3527f3cece4c');
 
 exports.scrape =async (req, res)=>{
 
@@ -141,14 +141,16 @@ console.log('initial done')
         }
         //console.log('summerized content: ', resp)
         //
-
+        try{
         await newsJson.news.push({
           "title": titleArrayToi[i],
           "url": urlArrayToi[i],
           "content":resp.output,
           "source": "Times of india",
           "time":updateTime 
-        })
+        })}catch(e){
+          console.log(e)
+        }
         console.log("toi final")
       }
     })();
