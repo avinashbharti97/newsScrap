@@ -327,14 +327,13 @@ console.log('initial done')
   //making a post request to restdb.io
   const options = {
     headers:{
-      'x-apikey': '58e92897164a893a31a9c6ea6a817a1cfe973',
-      'Content-type': 'application/json'
+      'Content-type': 'application/json',
     }
   } 
 
-  axios.put('https://covidnews-45ef.restdb.io/rest/news/5e8be8c75053da750001d448', obj, options)
+  axios.put('https://api.jsonbin.io/b/5e8ecc638e85c8437012fd64', obj, options)
     .then((res)=>{
-      console.log('put successful: '+res);
+      console.log('put successful: '+res.success);
     },
       (error)=>{
         console.log(error);
