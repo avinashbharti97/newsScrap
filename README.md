@@ -1,11 +1,9 @@
 # covid-19 news 
 
 Get latest covid-19 summerized news from different India's news leading platform at same place
-## Desktop view
-![](covidNewsDesktop.gif)
+## Blog
+[covidnews.media - dev.to ](https://dev.to/avinashbharti97/i-built-covidnews-media-while-being-in-covid-19-lockdown-394l)
 
-## Mobile view
-![](mobile.gif)
 ---
 # Technology used
 
